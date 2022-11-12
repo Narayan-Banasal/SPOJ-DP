@@ -29,35 +29,39 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define dbg(...)
 #endif
 
+int solve(int i, int j, v<int> &nums, v<int> &arr, v<v<int>> &dp){
+    int n = nums.size(), m = arr.size();
+    if (i == 0) if (j == n) return 0;
+    if (i == 1) if (j == m) return 0;
+    if (dp[i][j] != -1) return dp[i][j];
+    int ans = INT_MIN;
+    if (i == 0){
+        int id = (lb(all(arr), nums[j]) - arr.begin()) + 1;
+        if (id < m+1 and (arr[id-1] == nums[j])) ans = nums[j] + solve(1, id, nums, arr, dp);
+        ans = max(ans, nums[j] + solve(0, j+1, nums, arr, dp));
+    }
+    else {
+        int id = (lb(all(nums), arr[j]) - nums.begin()) + 1;
+        if (id < n+1 and (nums[id-1] == arr[j]))   ans = arr[j] + solve(0, id, nums, arr, dp);
+        ans = max(ans, arr[j] + solve(1, j+1, nums, arr, dp));
+    }
+
+    return dp[i][j] = ans;
+}
+
 int32_t main(){
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
     while(1){
         int n;cin >> n;
         if (n == 0) break;
-        v<v<int>> nums(n, v<int> (3)), dp(n+1, v<int> (3, 1e15));
+        v<int> nums(n);
         cin >> nums;
-        dp[1][1] = nums[0][1], dp[1][2] = dp[1][1] + nums[0][2];
-        for (int i = 1;i < n;i++){
-            for (int j = 0;j < 3;j++){
-                if (j == 0){
-                    dp[i+1][j] = min({dp[i][j] + nums[i][j], dp[i][j+1] + nums[i][j], dp[i+1][j]});
-                }
-                else if (j == 1){
-                    dp[i+1][j] = min({dp[i][j-1] + nums[i][j], dp[i+1][j-1] + nums[i][j], dp[i][j+1] + nums[i][j], dp[i][j] + nums[i][j], dp[i+1][j]});
-                }
-                else {
-                    dp[i+1][j] = min({dp[i+1][j-1] + nums[i][j], dp[i][j-1] + nums[i][j], dp[i][j] + nums[i][j], dp[i+1][j]});
-                }
-            }
-        }
-        cout << t << ". " << dp[n][1] << "\n";
-        t += 1;
-        
+        int m;cin >> m;
+        v<int> arr(m);cin >> arr;
+        v<v<int>> dp(2, v<int> (max(n, m), -1));
+        cout << max(solve(0, 0, nums, arr, dp), solve(1, 0, nums, arr, dp)) << '\n';
     }
 }
-
-

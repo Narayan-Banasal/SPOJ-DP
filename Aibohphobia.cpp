@@ -28,36 +28,30 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #else
 #define dbg(...)
 #endif
-
 int32_t main(){
     ios::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
     int t = 1;
-    // cin >> t;
-    while(1){
-        int n;cin >> n;
-        if (n == 0) break;
-        v<v<int>> nums(n, v<int> (3)), dp(n+1, v<int> (3, 1e15));
-        cin >> nums;
-        dp[1][1] = nums[0][1], dp[1][2] = dp[1][1] + nums[0][2];
-        for (int i = 1;i < n;i++){
-            for (int j = 0;j < 3;j++){
-                if (j == 0){
-                    dp[i+1][j] = min({dp[i][j] + nums[i][j], dp[i][j+1] + nums[i][j], dp[i+1][j]});
-                }
-                else if (j == 1){
-                    dp[i+1][j] = min({dp[i][j-1] + nums[i][j], dp[i+1][j-1] + nums[i][j], dp[i][j+1] + nums[i][j], dp[i][j] + nums[i][j], dp[i+1][j]});
+    cin >> t;
+    while(t--){
+        string str;cin >> str;
+        int n = str.size();
+        string temp = str;
+        reverse(all(temp));
+        v<v<int>> dp(n, v<int> (n, 0));
+        for (int i = 0;i < n;i++){
+            for (int j = 0;j < n;j++){
+                if (str[i] == temp[j]){
+                    dp[i][j] = 1;
+                    if (i != 0 and j != 0)  dp[i][j] += dp[i-1][j-1];
                 }
                 else {
-                    dp[i+1][j] = min({dp[i+1][j-1] + nums[i][j], dp[i][j-1] + nums[i][j], dp[i][j] + nums[i][j], dp[i+1][j]});
+                    if (i != 0) dp[i][j] = max(dp[i][j], dp[i-1][j]);
+                    if (j != 0) dp[i][j] = max(dp[i][j], dp[i][j-1]);
                 }
             }
         }
-        cout << t << ". " << dp[n][1] << "\n";
-        t += 1;
-        
+        cout << (n - dp[n-1][n-1]) << '\n';
     }
 }
-
-
